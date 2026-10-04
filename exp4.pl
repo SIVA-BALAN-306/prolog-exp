@@ -1,29 +1,25 @@
-connected(p,q,2).
-connected(p,r,4).
-connected(q,s,3).
-connected(q,t,1).
-connected(r,u,2).
-connected(r,v,5).
-connected(s,w,2).
-connected(t,w,4).
-connected(u,x,3).
-connected(v,x,1).
-connected(w,z,2).
-connected(x,z,4).
+numlist(N, N, [N]).
 
-bfs(Start, Goal, Path) :-
-    search([[Start]], Goal, RevPath),
-    reverse(RevPath, Path).
+numlist(I, N, [I|Rest]) :-
+    I < N,
+    I1 is I + 1,
+    numlist(I1, N, Rest).
 
-search([[Goal|Path]|_], Goal, [Goal|Path]).
+queens(N, Qs) :-
+    numlist(1, N, Ns),
+    permutation(Ns, Qs),
+    safe(Qs).
 
-search([Path|Paths], Goal, Solution) :-
-    extend(Path, NewPaths),
-    append(Paths, NewPaths, Paths1),
-    search(Paths1, Goal, Solution).
+safe([]).
 
-extend([Node|Path], NewPaths) :-
-    findall([NewNode,Node|Path],
-            (connected(Node,NewNode,_),
-             \+ member(NewNode,[Node|Path])),
-            NewPaths).
+safe([Q|Qs]) :-
+    no_attack(Q, Qs, 1),
+    safe(Qs).
+
+no_attack(_, [], _).
+
+no_attack(Q, [Q1|Qs], D) :-
+    Q =\= Q1,
+    abs(Q-Q1) =\= D,
+    D1 is D + 1,
+    no_attack(Q, Qs, D1).
